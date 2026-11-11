@@ -89,7 +89,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ initialEquipme
   };
 
   return (
-    <section id="servicios" className="py-24 bg-[#f5f5f7]">
+    <section id="servicios" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">

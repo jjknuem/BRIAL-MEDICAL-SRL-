@@ -102,7 +102,7 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
   ];
 
   return (
-    <section id="catalogo" className="py-24 bg-white border-t border-black/[0.04]">
+    <section id="catalogo" className="py-24 bg-white/75 backdrop-blur-md border-t border-black/[0.06]">
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">

@@ -50,7 +50,7 @@ export const CompanyPhilosophyPage: React.FC<CompanyPhilosophyPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] pt-24 pb-20 animate-in fade-in duration-300">
+    <div className="min-h-screen bg-transparent pt-24 pb-20 animate-in fade-in duration-300 relative">
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         {/* Navigation Breadcrumb */}
         <div className="flex items-center gap-2 text-xs text-[#86868b] mb-8 pt-4">

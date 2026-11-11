@@ -38,7 +38,7 @@ export const AboutValues: React.FC<AboutValuesProps> = ({ onOpenFullPhilosophyPa
   };
 
   return (
-    <section id="valores" className="py-24 bg-white border-y border-black/[0.04]">
+    <section id="valores" className="py-24 bg-white/75 backdrop-blur-md border-y border-black/[0.06]">
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         {/* Section Header with Logo Badge */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 pb-12 border-b border-black/[0.04]">

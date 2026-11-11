@@ -14,7 +14,7 @@ export const Footer: React.FC<FooterProps> = ({
   onOpenTerms
 }) => {
   return (
-    <footer className="bg-white border-t border-black/[0.06] text-[#86868b] text-xs pt-16 pb-12">
+    <footer className="bg-white/80 backdrop-blur-md border-t border-black/[0.06] text-[#86868b] text-xs pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         {/* Top Brand & Disclaimer */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-black/[0.06]">

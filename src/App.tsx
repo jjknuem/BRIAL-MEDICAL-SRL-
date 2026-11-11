@@ -9,6 +9,7 @@ import { Footer } from './components/Footer';
 import { SpecModal } from './components/SpecModal';
 import { CompanyPhilosophyPage } from './components/CompanyPhilosophyPage';
 import { LegalModal, LegalDocType } from './components/LegalModal';
+import { MedicalEquipmentBackground } from './components/MedicalEquipmentBackground';
 import { MedicalEquipment } from './types';
 
 export default function App() {
@@ -65,7 +66,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] text-[#1d1d1f] flex flex-col selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
+    <div className="min-h-screen bg-[#f5f5f7] text-[#1d1d1f] flex flex-col relative selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
+      {/* Blurred Medical Equipment Atmospheric Background */}
+      <MedicalEquipmentBackground />
+
       {/* Apple UI Glassmorphic Sticky Header */}
       <Navbar 
         onOpenServiceModal={() => handleOpenServiceModal()}
@@ -81,7 +85,7 @@ export default function App() {
       />
 
       {/* Main Content: Either Dedicated Philosophy Page or Home Flow */}
-      <main className="flex-1">
+      <main className="flex-1 relative z-10">
         {currentView === 'philosophy' ? (
           <CompanyPhilosophyPage
             onBackToHome={() => {

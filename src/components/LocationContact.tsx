@@ -23,7 +23,7 @@ export const LocationContact: React.FC = () => {
   const osmEmbedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${COMPANY_INFO.coordinates.lng - 0.02}%2C${COMPANY_INFO.coordinates.lat - 0.015}%2C${COMPANY_INFO.coordinates.lng + 0.02}%2C${COMPANY_INFO.coordinates.lat + 0.015}&layer=mapnik&marker=${COMPANY_INFO.coordinates.lat}%2C${COMPANY_INFO.coordinates.lng}`;
 
   return (
-    <section id="contacto" className="py-24 bg-[#f5f5f7]">
+    <section id="contacto" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
