@@ -1,0 +1,26 @@
+<svg viewBox="0 0 300 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Monogram BM -->
+  <g transform="translate(65, 20)">
+    <!-- Letter B in Deep Navy -->
+    <path d="M12 20 L26 20 L26 95 L12 95 L12 105 L52 105 C68 105 78 96 78 82 C78 72 71 65 61 62 C70 59 76 52 76 40 C76 27 66 18 50 18 L12 18 Z M40 33 L49 33 C56 33 60 37 60 44 C60 51 56 55 49 55 L40 55 Z M40 68 L50 68 C58 68 63 73 63 83 C63 92 57 96 50 96 L40 96 Z" fill="#072042"/>
+    <path d="M12 18 L12 28 L24 20 Z" fill="#072042"/>
+
+    <!-- Laboratory Flask (Beaker) inside lower loop of B -->
+    <g transform="translate(42, 70)">
+      <path d="M6 3 L12 3 M7 3 L7 7 L3 16 C2 18 3 20 5 20 L13 20 C15 20 16 18 15 16 L11 7 L11 3" stroke="#0080D7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M4.5 14 Q9 12 13.5 14 L14 18 C14 19 13.5 19.5 12.5 19.5 L5.5 19.5 C4.5 19.5 4 19 4 18 Z" fill="#0080D7" opacity="0.9"/>
+      <circle cx="9" cy="8" r="1.1" fill="#0080D7"/>
+      <circle cx="7" cy="11" r="0.9" fill="#0080D7"/>
+      <circle cx="11" cy="12" r="0.8" fill="#0080D7"/>
+    </g>
+
+    <!-- Letter M in Vibrant Azure Blue -->
+    <path d="M74 38 L95 72 L116 38 L138 38 L138 105 L124 105 L124 58 L101 92 L89 92 L66 58 L66 38 Z" fill="#0080D7"/>
+  </g>
+
+  <!-- Typography: B R I A L -->
+  <text x="150" y="175" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="34" letter-spacing="10" fill="#072042">BRIAL</text>
+  
+  <!-- Typography: M E D I C A L  S R L -->
+  <text x="150" y="210" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="16" letter-spacing="6" fill="#072042">MEDICAL SRL</text>
+</svg>

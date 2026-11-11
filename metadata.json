@@ -1,0 +1,6 @@
+{
+  "name": "AuraMed Biomedical - Equipos y Servicios Médicos",
+  "description": "Plataforma líder en instalación, mantenimiento especializado, calibración y venta de equipos médicos de alta tecnología hospitalaria con diseño Apple UI/UX.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
