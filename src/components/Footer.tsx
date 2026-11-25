@@ -106,8 +106,12 @@ export const Footer: React.FC<FooterProps> = ({
 
         {/* Bottom copyright and legal */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
-          <div>
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-2 gap-y-1">
             <span>Copyright © {new Date().getFullYear()} Brial Medical SRL. Todos los derechos reservados.</span>
+            <span aria-hidden="true" className="text-[#86868b]/60">·</span>
+            <span>
+              Hecho por <strong className="font-semibold text-[#1d1d1f]">Junior Neris</strong>
+            </span>
           </div>
 
           <div className="flex items-center gap-4 sm:gap-6 text-[#86868b]">

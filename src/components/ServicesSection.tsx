@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wrench, ShieldCheck, Activity, Gauge, CheckCircle2, AlertCircle, FileText, Download, X } from 'lucide-react';
+import { Wrench, ShieldCheck, Activity, Gauge, CheckCircle2, AlertCircle, Download, X, Mail, Send, Copy, Check, ExternalLink } from 'lucide-react';
 import { SERVICES_LIST } from '../data/mockData';
 import { ServiceRequestPayload, ServiceTicket } from '../types';
 import { BrialLogo } from './BrialLogo';
@@ -29,6 +29,13 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ initialEquipme
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generatedTicket, setGeneratedTicket] = useState<ServiceTicket | null>(null);
+  const [emailDraft, setEmailDraft] = useState<{
+    subject: string;
+    body: string;
+    mailtoUrl: string;
+    gmailUrl: string;
+  } | null>(null);
+  const [copiedEmailBody, setCopiedEmailBody] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
   const iconMap: Record<string, React.ElementType> = {
@@ -44,37 +51,102 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ initialEquipme
     if (formError) setFormError(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const buildEmailDraft = (ticketId: string, data: ServiceRequestPayload) => {
+    const subject = `[${ticketId}] Solicitud de Intervención Técnica - ${data.equipmentType} (${data.hospitalName})`;
+    const body = [
+      `SOLICITUD DE INTERVENCIÓN TÉCNICA (${ticketId})`,
+      `--------------------------------------------------`,
+      `Remitente: ${data.contactEmail}`,
+      `Responsable de Contacto: ${data.contactPerson}`,
+      `Teléfono Directo / Móvil: ${data.contactPhone}`,
+      `Hospital / Institución Médica: ${data.hospitalName}`,
+      `Equipo o Dispositivo: ${data.equipmentType}`,
+      `Número de Serie / Modelo: ${data.serialNumber?.trim() || 'No especificado'}`,
+      `Nivel de Urgencia Operativa: ${data.urgency}`,
+      ``,
+      `Descripción Técnica de la Falla o Solicitud:`,
+      data.issueDescription.trim(),
+    ].join('\n');
+
+    const mailtoUrl = `mailto:info@brialmedical.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=info@brialmedical.com&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    return { subject, body, mailtoUrl, gmailUrl };
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.hospitalName.trim() || !formData.equipmentType.trim() || !formData.issueDescription.trim() || !formData.contactPhone.trim()) {
-      setFormError('Por favor complete todos los campos obligatorios para generar su solicitud.');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    if (
+      !formData.hospitalName.trim() ||
+      !formData.equipmentType.trim() ||
+      !formData.issueDescription.trim() ||
+      !formData.contactPerson.trim() ||
+      !formData.contactPhone.trim() ||
+      !formData.contactEmail.trim()
+    ) {
+      setFormError('Por favor complete todos los campos obligatorios, incluido su correo electrónico.');
+      return;
+    }
+
+    if (!emailRegex.test(formData.contactEmail.trim())) {
+      setFormError('Por favor ingrese un correo electrónico válido.');
       return;
     }
 
     setIsSubmitting(true);
+    setFormError(null);
 
-    setTimeout(() => {
-      const randomId = Math.floor(1000 + Math.random() * 9000);
-      
-      const newTicket: ServiceTicket = {
-        ticketId: `BM-${randomId}`,
-        createdAt: new Date().toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }),
-        hospitalName: formData.hospitalName,
-        equipmentType: formData.equipmentType,
-        urgency: formData.urgency,
-        estimatedArrival: 'Atención oportuna Brial Medical',
-        assignedEngineer: 'Equipo Técnico Brial Medical SRL',
-        status: 'Recibido'
-      };
+    try {
+      const response = await fetch('/api/service-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-      setGeneratedTicket(newTicket);
+      const result = await response.json();
+
+      if (!response.ok || !result.ok || !result.ticket) {
+        setFormError(result.error || 'No se pudo procesar la solicitud. Verifique los datos e intente nuevamente.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      const ticket: ServiceTicket = result.ticket;
+      const draft = buildEmailDraft(ticket.ticketId, formData);
+
+      setEmailDraft(draft);
+      setGeneratedTicket(ticket);
+
+      if (!result.sentViaServer) {
+        const mailLink = document.createElement('a');
+        mailLink.href = draft.mailtoUrl;
+        mailLink.style.display = 'none';
+        document.body.appendChild(mailLink);
+        mailLink.click();
+        document.body.removeChild(mailLink);
+      }
+    } catch {
+      setFormError('Error de conexión con el servidor al enviar la solicitud. Intente nuevamente.');
+    } finally {
       setIsSubmitting(false);
-    }, 750);
+    }
+  };
+
+  const handleCopyEmail = () => {
+    if (!emailDraft) return;
+    const fullText = `Para: info@brialmedical.com\nDe: ${formData.contactEmail}\nAsunto: ${emailDraft.subject}\n\n${emailDraft.body}`;
+    navigator.clipboard.writeText(fullText);
+    setCopiedEmailBody(true);
+    setTimeout(() => setCopiedEmailBody(false), 2500);
   };
 
   const handleResetForm = () => {
     setGeneratedTicket(null);
+    setEmailDraft(null);
+    setCopiedEmailBody(false);
     setFormData({
       hospitalName: '',
       equipmentType: '',
@@ -290,14 +362,15 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ initialEquipme
 
                 <div>
                   <label className="block text-xs font-semibold text-[#1d1d1f] mb-2">
-                    Correo Institucional
+                    Correo Electrónico del Solicitante *
                   </label>
                   <input
                     type="email"
                     name="contactEmail"
                     value={formData.contactEmail}
                     onChange={handleInputChange}
-                    placeholder="biomedica@hospital.com"
+                    placeholder="su-correo@institucion.com"
+                    required
                     className="w-full px-4 py-3 bg-[#f5f5f7] border-0 rounded-xl text-sm text-[#1d1d1f] placeholder:text-[#86868b] focus:bg-white focus:ring-2 focus:ring-[#0071e3] transition-all outline-none"
                   />
                 </div>
@@ -306,14 +379,14 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ initialEquipme
               {/* Submit CTA */}
               <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p className="text-[11px] text-[#86868b]">
-                  Atención técnica especializada y registro confidencial de la solicitud.
+                  La solicitud se enviará desde su correo hacia <strong className="text-[#1d1d1f]">info@brialmedical.com</strong>.
                 </p>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="apple-button-pill w-full sm:w-auto px-8 py-3.5 bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-sm shadow-sm transition-all cursor-pointer disabled:opacity-50"
                 >
-                  {isSubmitting ? 'Transmitiendo Orden a Central...' : 'Emitir Orden de Servicio'}
+                  {isSubmitting ? 'Procesando Solicitud...' : 'Enviar Solicitud a Brial Medical'}
                 </button>
               </div>
             </form>
@@ -321,28 +394,29 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ initialEquipme
         </div>
       </div>
 
-      {/* Confirmation Modal / Ticket Generation */}
+      {/* Confirmation / Direct Email Dispatch Modal */}
       {generatedTicket && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-black/[0.08] shadow-2xl relative">
             <button
               onClick={handleResetForm}
-              className="absolute top-6 right-6 p-2 rounded-full hover:bg-black/5 text-[#86868b] hover:text-[#1d1d1f] transition-colors"
+              aria-label="Cerrar"
+              className="absolute top-6 right-6 p-2 rounded-full hover:bg-black/5 text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
             >
               <X size={18} />
             </button>
 
             <div className="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-black/[0.06]">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                  <CheckCircle2 size={24} />
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${generatedTicket.sentViaServer ? 'bg-emerald-50 text-emerald-600' : 'bg-[#0071e3]/10 text-[#0071e3]'}`}>
+                  {generatedTicket.sentViaServer ? <CheckCircle2 size={24} /> : <Mail size={24} />}
                 </div>
                 <div>
-                  <span className="text-xs font-semibold text-emerald-600 tracking-wider uppercase">
-                    Orden Oficial Emitida
+                  <span className={`text-xs font-semibold tracking-wider uppercase ${generatedTicket.sentViaServer ? 'text-emerald-600' : 'text-[#0071e3]'}`}>
+                    {generatedTicket.sentViaServer ? 'Correo Enviado Correctamente' : 'Listo para Enviar por Correo'}
                   </span>
                   <h4 className="text-lg font-bold text-[#1d1d1f]">
-                    Ticket #{generatedTicket.ticketId}
+                    Orden #{generatedTicket.ticketId}
                   </h4>
                 </div>
               </div>
@@ -351,50 +425,98 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ initialEquipme
               </div>
             </div>
 
-            <div className="bg-[#f5f5f7] rounded-2xl p-5 mb-6 space-y-3 text-xs sm:text-sm">
-              <div className="flex justify-between items-center py-1 border-b border-black/[0.04]">
-                <span className="text-[#86868b]">Hospital / Centro:</span>
-                <span className="font-semibold text-[#1d1d1f]">{generatedTicket.hospitalName}</span>
+            <div className="bg-[#f5f5f7] rounded-2xl p-5 mb-5 space-y-2.5 text-xs sm:text-sm">
+              <div className="flex justify-between items-center py-1 border-b border-black/[0.04] gap-3">
+                <span className="text-[#86868b] shrink-0">De (Su Correo):</span>
+                <span className="font-semibold text-[#1d1d1f] truncate">{generatedTicket.fromEmail}</span>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-black/[0.04]">
-                <span className="text-[#86868b]">Dispositivo:</span>
-                <span className="font-semibold text-[#1d1d1f]">{generatedTicket.equipmentType}</span>
+              <div className="flex justify-between items-center py-1 border-b border-black/[0.04] gap-3">
+                <span className="text-[#86868b] shrink-0">Para:</span>
+                <span className="font-semibold text-[#0071e3] truncate">{generatedTicket.toEmail}</span>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-black/[0.04]">
-                <span className="text-[#86868b]">Nivel de Prioridad:</span>
-                <span className="font-semibold text-[#0071e3]">{generatedTicket.urgency}</span>
+              <div className="flex justify-between items-center py-1 border-b border-black/[0.04] gap-3">
+                <span className="text-[#86868b] shrink-0">Hospital / Centro:</span>
+                <span className="font-semibold text-[#1d1d1f] truncate">{generatedTicket.hospitalName}</span>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-black/[0.04]">
-                <span className="text-[#86868b]">Soporte Técnico:</span>
-                <span className="font-semibold text-[#1d1d1f]">{generatedTicket.assignedEngineer}</span>
+              <div className="flex justify-between items-center py-1 border-b border-black/[0.04] gap-3">
+                <span className="text-[#86868b] shrink-0">Dispositivo:</span>
+                <span className="font-semibold text-[#1d1d1f] truncate">{generatedTicket.equipmentType}</span>
               </div>
-              <div className="flex justify-between items-center py-1">
-                <span className="text-[#86868b]">Estado de la Solicitud:</span>
-                <span className="font-bold text-emerald-600">{generatedTicket.status}</span>
+              <div className="flex justify-between items-center py-1 gap-3">
+                <span className="text-[#86868b] shrink-0">Nivel de Prioridad:</span>
+                <span className="font-semibold text-[#0071e3] truncate">{generatedTicket.urgency}</span>
               </div>
             </div>
 
-            <p className="text-xs text-[#86868b] leading-relaxed mb-6">
-              Hemos registrado su solicitud. Nuestro equipo técnico se comunicará directamente con su contacto para coordinar la asistencia o intervención técnica requerida.
-            </p>
+            {generatedTicket.sentViaServer ? (
+              <>
+                <p className="text-xs text-[#515154] leading-relaxed mb-6">
+                  Su solicitud técnica fue enviada directamente a <strong className="text-[#1d1d1f]">{generatedTicket.toEmail}</strong> con dirección de respuesta (<span className="font-medium">Reply-To</span>) hacia <strong className="text-[#1d1d1f]">{generatedTicket.fromEmail}</strong>. Nuestro equipo técnico responderá a la brevedad.
+                </p>
 
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  window.print();
-                }}
-                className="apple-button-pill flex-1 py-3 bg-[#f5f5f7] hover:bg-black/[0.08] text-[#1d1d1f] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <Download size={14} />
-                <span>Imprimir Comprobante</span>
-              </button>
-              <button
-                onClick={handleResetForm}
-                className="apple-button-pill flex-1 py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-medium flex items-center justify-center gap-1.5"
-              >
-                <span>Aceptar y Cerrar</span>
-              </button>
-            </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => window.print()}
+                    className="apple-button-pill flex-1 py-3 bg-[#f5f5f7] hover:bg-black/[0.08] text-[#1d1d1f] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Download size={14} />
+                    <span>Imprimir Comprobante</span>
+                  </button>
+                  <button
+                    onClick={handleResetForm}
+                    className="apple-button-pill flex-1 py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <span>Aceptar y Cerrar</span>
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-xs text-[#515154] leading-relaxed mb-5">
+                  Para enviar el correo directamente desde <strong className="text-[#1d1d1f]">{generatedTicket.fromEmail}</strong> hacia <strong className="text-[#1d1d1f]">{generatedTicket.toEmail}</strong>, confirme el envío en su aplicación de correo o use Gmail Web:
+                </p>
+
+                {emailDraft && (
+                  <div className="space-y-2.5 mb-5">
+                    <a
+                      href={emailDraft.mailtoUrl}
+                      className="apple-button-pill w-full py-3.5 px-5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs sm:text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-colors"
+                    >
+                      <Send size={15} />
+                      <span>Abrir App de Correo y Enviar</span>
+                    </a>
+
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <a
+                        href={emailDraft.gmailUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="apple-button-pill py-2.5 px-4 bg-[#f5f5f7] hover:bg-black/[0.08] text-[#1d1d1f] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
+                      >
+                        <ExternalLink size={14} />
+                        <span>Enviar con Gmail</span>
+                      </a>
+
+                      <button
+                        type="button"
+                        onClick={handleCopyEmail}
+                        className="apple-button-pill py-2.5 px-4 bg-[#f5f5f7] hover:bg-black/[0.08] text-[#1d1d1f] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        {copiedEmailBody ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                        <span>{copiedEmailBody ? 'Copiado' : 'Copiar Correo'}</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  onClick={handleResetForm}
+                  className="w-full py-2.5 text-xs text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
+                >
+                  Cerrar ventana
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

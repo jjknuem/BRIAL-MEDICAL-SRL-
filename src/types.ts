@@ -58,7 +58,10 @@ export interface ServiceTicket {
   urgency: string;
   estimatedArrival: string;
   assignedEngineer: string;
-  status: 'Recibido' | 'Ingeniero Asignado' | 'En Ruta' | 'En Proceso';
+  status: 'Enviado por Correo' | 'Pendiente de Envío por Cliente';
+  fromEmail: string;
+  toEmail: string;
+  sentViaServer: boolean;
 }
 
 export interface ServiceLocation {
