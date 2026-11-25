@@ -1,5 +1,6 @@
 import React from 'react';
-import brialLogoSrc from '../assets/BRIAL LOGO.jpg';
+
+const brialLogoSrc = '/BRIAL LOGO.jpg';
 
 interface BrialLogoProps {
   variant?: 'full' | 'compact' | 'icon';

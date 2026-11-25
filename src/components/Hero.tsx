@@ -15,7 +15,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenServiceModal, onExploreCatalog
         <div className="text-center max-w-4xl mx-auto mb-12 md:mb-16">
           <div className="inline-flex items-center gap-2.5 px-4 py-1.5 mb-6 rounded-full bg-white border border-black/[0.06] shadow-2xs text-[13px] text-[#515154] tracking-tight">
             <img
-              src="/src/assets/BRIAL LOGO.jpg"
+              src="/BRIAL LOGO.jpg"
               alt="Brial Medical SRL"
               className="w-5 h-5 object-contain rounded-sm"
             />
@@ -55,7 +55,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenServiceModal, onExploreCatalog
         <div className="relative max-w-6xl mx-auto">
           <div className="rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border border-black/[0.08] bg-[#1d1d1f] aspect-video sm:aspect-[16/9] relative group">
             <img
-              src="/src/assets/laboratorio.jpg"
+              src="/laboratorio.jpg"
               alt="Instalaciones y especialistas de laboratorio clínico Brial Medical SRL"
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.01]"
