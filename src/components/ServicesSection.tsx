@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wrench, ShieldCheck, Activity, Gauge, CheckCircle2, AlertCircle, X, Mail, Send, Copy, Check, ExternalLink } from 'lucide-react';
+import { Wrench, ShieldCheck, Activity, Gauge, CheckCircle2, AlertCircle, X, Mail, Send, Copy, Check } from 'lucide-react';
 import { SERVICES_LIST } from '../data/mockData';
 import { ServiceRequestPayload, ServiceTicket } from '../types';
 import { BrialLogo } from './BrialLogo';
@@ -31,7 +31,6 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ initialEquipme
   const [emailDraft, setEmailDraft] = useState<{
     subject: string;
     body: string;
-    mailtoUrl: string;
     gmailUrl: string;
   } | null>(null);
   const [copiedEmailBody, setCopiedEmailBody] = useState(false);
@@ -67,10 +66,9 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ initialEquipme
       data.issueDescription.trim(),
     ].join('\n');
 
-    const mailtoUrl = `mailto:info@brialmedical.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=info@brialmedical.com&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-    return { subject, body, mailtoUrl, gmailUrl };
+    return { subject, body, gmailUrl };
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -436,33 +434,23 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ initialEquipme
 
             <div className="space-y-2.5 mb-5">
               <a
-                href={emailDraft.mailtoUrl}
+                href={emailDraft.gmailUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="apple-button-pill w-full py-3.5 px-5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs sm:text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-colors"
               >
                 <Send size={15} />
-                <span>Abrir App de Correo y Enviar</span>
+                <span>Enviar con Gmail</span>
               </a>
 
-              <div className="grid grid-cols-2 gap-2.5">
-                <a
-                  href={emailDraft.gmailUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="apple-button-pill py-2.5 px-4 bg-[#f5f5f7] hover:bg-black/[0.08] text-[#1d1d1f] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
-                >
-                  <ExternalLink size={14} />
-                  <span>Enviar con Gmail</span>
-                </a>
-
-                <button
-                  type="button"
-                  onClick={handleCopyEmail}
-                  className="apple-button-pill py-2.5 px-4 bg-[#f5f5f7] hover:bg-black/[0.08] text-[#1d1d1f] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  {copiedEmailBody ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
-                  <span>{copiedEmailBody ? 'Copiado' : 'Copiar Correo'}</span>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleCopyEmail}
+                className="apple-button-pill w-full py-2.5 px-4 bg-[#f5f5f7] hover:bg-black/[0.08] text-[#1d1d1f] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              >
+                {copiedEmailBody ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                <span>{copiedEmailBody ? 'Copiado' : 'Copiar Correo'}</span>
+              </button>
             </div>
 
             <button
