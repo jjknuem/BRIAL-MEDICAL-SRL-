@@ -110,7 +110,7 @@ export const Footer: React.FC<FooterProps> = ({
             <span>Copyright © {new Date().getFullYear()} Brial Medical SRL. Todos los derechos reservados.</span>
             <span aria-hidden="true" className="text-[#86868b]/60">·</span>
             <span>
-              Hecho por <strong className="font-semibold text-[#1d1d1f]">Junior Neris</strong>
+              Hecho por <strong className="font-semibold text-[#1d1d1f]">JN Deploy</strong>
             </span>
           </div>
 
